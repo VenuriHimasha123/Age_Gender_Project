@@ -1,0 +1,12 @@
+/* assets/style.css */
+body {
+    background-color: #000000;
+    color: #fafa33; /* Neon Yellow */
+}
+.stApp {
+    background-color: #0d0d0d;
+}
+h1, h2, h3 {
+    color: #fafa33 !important;
+    text-shadow: 0 0 10px #fafa33;
+}
