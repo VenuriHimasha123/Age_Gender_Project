@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers, models
+from tensorflow.keras import layers, models, Input
 import cv2
 import os
 
@@ -18,48 +18,69 @@ def load_and_preprocess_image(image_name):
     img = cv2.resize(img, (128, 128)) 
     return img / 255.0 
 
-# 3. Build the CNN Brain
-print("🧠 Building CNN Architecture...")
-model = models.Sequential([
-    layers.Input(shape=(128, 128, 3)), # Fixed the 'input_shape' warning
-    layers.Conv2D(32, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Flatten(),
-    layers.Dense(64, activation='relu'),
-    layers.Dense(1, activation='sigmoid', name='gender_output') 
-])
+# 3. Build the Multi-Output CNN (Functional API)
+print("🧠 Building Multi-Output CNN Architecture...")
+inputs = Input(shape=(128, 128, 3))
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# Shared Convolutional Base
+x = layers.Conv2D(32, (3, 3), activation='relu')(inputs)
+x = layers.MaxPooling2D((2, 2))(x)
+x = layers.Conv2D(64, (3, 3), activation='relu')(x)
+x = layers.MaxPooling2D((2, 2))(x)
+x = layers.Conv2D(128, (3, 3), activation='relu')(x)
+x = layers.MaxPooling2D((2, 2))(x)
+x = layers.Flatten()(x)
+x = layers.Dense(128, activation='relu')(x)
+x = layers.Dropout(0.3)(x) # Helps prevent overfitting
 
-# 4. Data Loading (Testing with a subset first to ensure it works)
+# Branch 1: Gender (Classification - Sigmoid)
+gender_output = layers.Dense(1, activation='sigmoid', name='gender_output')(x)
+
+# Branch 2: Age (Regression - ReLU/Linear)
+age_output = layers.Dense(1, activation='linear', name='age_output')(x)
+
+# Combine into one model
+model = models.Model(inputs=inputs, outputs=[gender_output, age_output])
+
+# Compile with two different loss functions
+model.compile(
+    optimizer='adam',
+    loss={'gender_output': 'binary_crossentropy', 'age_output': 'mse'},
+    metrics={'gender_output': 'accuracy', 'age_output': 'mae'}
+)
+
+# 4. Data Loading
 X = []
-y = []
+y_gender = []
+y_age = []
 
-print("🔄 Loading first 1000 images for training...")
-for img_name in df['image'][:1000]: 
-    processed_img = load_and_preprocess_image(img_name)
+# Using 2000 images for better age variety (You can increase this to [:] for full training)
+print("🔄 Loading 2000 images for multi-task training...")
+for i, row in df.head(10000).iterrows(): 
+    processed_img = load_and_preprocess_image(row['image'])
     if processed_img is not None:
         X.append(processed_img)
-        # Assuming gender is at index 1 based on your previous 'prepare_data' output
-        # Update: We take the gender column from our CSV
-        # Let's use the actual CSV data:
-        pass 
-
-# Get labels from CSV for the first 1000
-y = df['gender'][:1000].values
+        y_gender.append(row['gender'])
+        y_age.append(row['age'])
 
 X = np.array(X)
-y = np.array(y)
+y_gender = np.array(y_gender)
+y_age = np.array(y_age)
 
-# 5. THE ACTUAL TRAINING COMMAND (This makes the script 'Work')
+# 5. THE TRAINING COMMAND
 print(f"🚀 TRAINING STARTING NOW on {len(X)} images...")
-model.fit(X, y, epochs=10, batch_size=32)
+model.fit(
+    X, 
+    {'gender_output': y_gender, 'age_output': y_age}, 
+    epochs=30, 
+    batch_size=32,
+    validation_split=0.1
+)
 
 # 6. Save the results
 if not os.path.exists('models'):
     os.makedirs('models')
 
-model.save('models/gender_model.h5')
-print("✅ Success! Model saved in 'models/gender_model.h5'")
+# Save as a combined model
+model.save('models/age_gender_model.h5')
+print("✅ Success! Combined Model saved in 'models/age_gender_model.h5'")
