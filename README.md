@@ -8,18 +8,11 @@ ChronosID Analytics is a high-performance neural vision platform designed for re
 #  Core Features
 Neural Vision Scanner: Real-time biometric analysis using OpenCV and TensorFlow/Keras.
 
-3D Neural Core: A real-time 3D rotating core rendered via CSS preserve-3d matrix transforms.
-
 Hyper-Glassmorphism UI: High-end frosted glass interface with saturation filters and smooth global scrolling.
 
 Dual-Mode Biometrics: Supports both Live Camera Scanner and Static Image Uploads.
 
 Cloud Data Persistence: Integrated with MongoDB Atlas for secure user management and telemetry storage.
-
-Gemini said
-Here is a professional, high-impact GitHub README.md content specifically tailored for your ChronosID Analytics project at KDU. It highlights your advanced tech stack, the 3D UI, and the biometric capabilities.
-
-
 
 ##  Tech Stack
 Category	Technology
