@@ -1,4 +1,5 @@
-![Uploading imgg.png…]()
+<img width="1875" height="858" alt="imgg" src="https://github.com/user-attachments/assets/7c19be35-7645-4203-9aea-e78c326f942e" />
+
 
 
 # ChronosID Analytics: Biometric Intelligence Engine
@@ -18,21 +19,7 @@ Cloud Data Persistence: Integrated with MongoDB Atlas for secure user management
 Gemini said
 Here is a professional, high-impact GitHub README.md content specifically tailored for your ChronosID Analytics project at KDU. It highlights your advanced tech stack, the 3D UI, and the biometric capabilities.
 
-# 🛡️ ChronosID Analytics: Biometric Intelligence Engine
-ChronosID Analytics is a high-performance neural vision platform designed for real-time age and gender estimation. Built with a futuristic Cyber-Neon aesthetic, it combines deep learning with cloud data persistence and advanced 3D web rendering.
 
-## 🚀 Core Features
-Neural Vision Scanner: Real-time biometric analysis using OpenCV and TensorFlow/Keras.
-
-3D Neural Core: A real-time 3D rotating core rendered via CSS preserve-3d matrix transforms.
-
-Hyper-Glassmorphism UI: High-end frosted glass interface with saturation filters and smooth global scrolling.
-
-Dual-Mode Biometrics: Supports both Live Camera Scanner and Static Image Uploads.
-
-Cloud Data Persistence: Integrated with MongoDB Atlas for secure user management and telemetry storage.
-
-Automated Reporting: Generates forensic-style PDF Biometric Profiles using FPDF.
 
 ##  Tech Stack
 Category	Technology
@@ -42,43 +29,8 @@ Backend	Python, MongoDB Atlas (NoSQL)
 Computer Vision	OpenCV (CV2), NumPy
 Documentation	FPDF, UUID Tracking
 
-Gemini said
-Here is a professional, high-impact GitHub README.md content specifically tailored for your ChronosID Analytics project at KDU. It highlights your advanced tech stack, the 3D UI, and the biometric capabilities.
 
-# 🛡️ ChronosID Analytics: Biometric Intelligence Engine
-ChronosID Analytics is a high-performance neural vision platform designed for real-time age and gender estimation. Built with a futuristic Cyber-Neon aesthetic, it combines deep learning with cloud data persistence and advanced 3D web rendering.
-
-## 🚀 Core Features
-Neural Vision Scanner: Real-time biometric analysis using OpenCV and TensorFlow/Keras.
-
-3D Neural Core: A real-time 3D rotating core rendered via CSS preserve-3d matrix transforms.
-
-Hyper-Glassmorphism UI: High-end frosted glass interface with saturation filters and smooth global scrolling.
-
-Dual-Mode Biometrics: Supports both Live Camera Scanner and Static Image Uploads.
-
-Cloud Data Persistence: Integrated with MongoDB Atlas for secure user management and telemetry storage.
-
-Automated Reporting: Generates forensic-style PDF Biometric Profiles using FPDF.
-
-## 🛠️ Tech Stack
-Category	Technology
-Frontend	Streamlit, Custom CSS3 (Preserve-3D)
-Deep Learning	TensorFlow, Keras, Haar Cascades
-Backend	Python, MongoDB Atlas (NoSQL)
-Computer Vision	OpenCV (CV2), NumPy
-Documentation	FPDF, UUID Tracking
-## 📂 Project Structure
-Plaintext
-Age_Gender_Project/
-├── models/
-│   ├── haarcascade_frontalface_default.xml  # Face Detection Logic
-│   └── age_gender_model.h5                  # Trained Neural Network
-├── scripts/
-│   └── app.py                               # Main Application Engine
-├── requirements.txt                         # Dependency Manifest
-└── README.md                                # Project Documentation
-## ⚙️ Installation & Setup
+##  Installation & Setup
 Clone the Repository
 
 Bash
