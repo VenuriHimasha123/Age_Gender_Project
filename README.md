@@ -27,7 +27,7 @@ Documentation	FPDF, UUID Tracking
 Clone the Repository
 
 Bash
-git clone https://github.com/your-username/ChronosID-Analytics.git
+git clone https://github.com/VenuriHimasha123/Age_Gender_Project.git
 cd ChronosID-Analytics
 Install Dependencies
 
