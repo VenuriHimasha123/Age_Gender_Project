@@ -18,14 +18,13 @@ MONGO_URI = "mongodb+srv://venurihimasha123_db_user:venuri@cluster0.uhy55kg.mong
 def init_connection():
     try:
         client = MongoClient(MONGO_URI, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=5000)
-        client.admin.command('ping')
         return client.AgeGenderDB
     except Exception:
         return None
 
 db = init_connection()
 
-# --- 2. PDF GENERATION LOGIC (FIXED FOR WINDOWS + CROPPED IMAGES) ---
+# --- 2. PDF GENERATION LOGIC ---
 class BiometricReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 15)
@@ -37,92 +36,110 @@ def generate_pdf_report(operator, results):
     pdf = BiometricReport()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    
-    # Metadata
     pdf.set_text_color(0, 0, 0)
     pdf.cell(0, 10, f"Authorized Operator: {operator}", ln=True)
     pdf.cell(0, 10, f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
     pdf.cell(0, 10, f"Total Subjects Detected: {len(results)}", ln=True)
     pdf.ln(10)
-
-    # Table Header
     pdf.set_fill_color(234, 255, 0) 
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(40, 10, "Profile", 1, 0, 'C', True)
-    pdf.cell(35, 10, "Subject ID", 1, 0, 'C', True)
+    pdf.cell(35, 10, "ID", 1, 0, 'C', True)
     pdf.cell(35, 10, "Gender", 1, 0, 'C', True)
     pdf.cell(40, 10, "Age Range", 1, 0, 'C', True)
     pdf.cell(40, 10, "Confidence", 1, 1, 'C', True)
-
-    pdf.set_font("Arial", size=10)
     
     temp_image_paths = []
-
     for res in results:
-        # Create a unique temporary path for each crop to avoid PermissionErrors on Windows
         temp_path = os.path.join(tempfile.gettempdir(), f"crop_{uuid.uuid4().hex}.jpg")
         cv2.imwrite(temp_path, res['crop_bgr'])
         temp_image_paths.append(temp_path)
-
         curr_y = pdf.get_y()
-        # Add image to PDF cell (placed within the first column)
         pdf.image(temp_path, x=13, y=curr_y + 2, w=34, h=16)
-        
-        # Table Row (Empty string for the first cell where the image is placed)
         pdf.cell(40, 20, "", 1) 
         pdf.cell(35, 20, res['id'], 1, 0, 'C')
         pdf.cell(35, 20, res['gender'], 1, 0, 'C')
         pdf.cell(40, 20, f"{res['age_range']} Yrs", 1, 0, 'C')
         pdf.cell(40, 20, f"{res['confidence']}%", 1, 1, 'C')
-
-    # Output to byte stream
-    pdf_output = pdf.output(dest='S').encode('latin-1')
     
-    # Cleanup temp files after generation is finished
+    pdf_output = pdf.output(dest='S').encode('latin-1')
     for path in temp_image_paths:
-        try:
-            os.remove(path)
-        except:
-            pass
-
+        try: os.remove(path)
+        except: pass
     return pdf_output
 
 # --- 3. PAGE CONFIGURATION ---
-st.set_page_config(page_title="ChronosID Analytics | Secure Vision", layout="wide", page_icon="🛡️")
+st.set_page_config(page_title="ChronosID Analytics | Hyper Vision", layout="wide", page_icon="")
 
-# --- 4. ADVANCED NEON, 3D CARDS & ANIMATION CSS ---
+# --- 4. ADVANCED CSS: GLASSMORPHISM, SMOOTH SCROLLING & UI FIXES ---
 st.markdown("""
     <style>
-    .stApp { background: radial-gradient(circle at center, #2e2e2e 0%, #1a1a1a 100%); background-attachment: fixed; }
-    h1, h2, h3, h4, h5, h6, .stText, p, label, span, .stMarkdown {
-        color: #EAFF00 !important; text-shadow: 0 0 15px #EAFF00; font-family: 'Courier New', Courier, monospace;
-    }
-    .typewriter-text {
-        overflow: hidden; border-right: .15em solid #EAFF00; white-space: nowrap; margin: 0 auto; letter-spacing: .10em;
-        font-size: 1.1rem; font-weight: bold; animation: typing 5s steps(50, end), blink-caret .75s step-end infinite;
-    }
-    @keyframes typing { from { width: 0 } to { width: 100% } }
-    @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #EAFF00; } }
-
-    .metric-card, .auth-card {
-        background: rgba(0,0,0,0.7); border: 2px solid #EAFF00; border-radius: 15px; padding: 25px;
-        box-shadow: 0 10px 30px rgba(234, 255, 0, 0.2); transition: transform 0.3s;
-    }
-    .metric-card:hover { transform: translateY(-5px); }
-
-    [data-testid="stSidebar"] { background-color: #000000 !important; border-right: 2px solid #EAFF00; }
-    .stButton>button {
-        background-color: #000; color: #EAFF00; border: 2px solid #EAFF00;
-        box-shadow: 0 0 10px #EAFF00; width: 100%; transition: 0.3s;
-    }
-    .stButton>button:hover { background-color: #EAFF00; color: #000; }
+    /* Global Smooth Scrolling */
+    html { scroll-behavior: smooth; }
     
-    .scanner-container { position: relative; overflow: hidden; border: 2px solid #EAFF00; border-radius: 10px; }
-    .scanner-line {
-        position: absolute; width: 100%; height: 4px; background: #EAFF00;
-        box-shadow: 0 0 15px #EAFF00; animation: scan 3s linear infinite; z-index: 10;
+    .stApp {
+        background: radial-gradient(circle at center, #0a0a2e 0%, #000000 100%);
+        background-attachment: fixed;
     }
-    @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+    /* GLASSMORPHISM UNIVERSAL STYLE */
+    .metric-card, .auth-card, .stTabs, [data-testid="stMetricValue"], 
+    [data-testid="stSidebar"] > div:first-child, .stFileUploader, .stCameraInput {
+        background: rgba(255, 255, 255, 0.04) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+        transition: transform 0.3s ease;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+
+    [data-testid="stSidebar"] {
+        background-color: transparent !important;
+        border-right: 1px solid rgba(0, 242, 255, 0.2);
+    }
+
+    /* 3D Neural Cube Component */
+    .single-cube-container {
+        width: 100%; height: 280px; display: flex; justify-content: center; align-items: center;
+        perspective: 1000px; margin: 20px 0;
+    }
+    .cube {
+        width: 100px; height: 100px; position: relative; transform-style: preserve-3d;
+        animation: rotateFull 12s infinite linear;
+    }
+    .face {
+        position: absolute; width: 100px; height: 100px; border: 2px solid #00f2ff;
+        background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 25px #00f2ff, inset 0 0 15px #00f2ff;
+    }
+    .front  { transform: rotateY(0deg) translateZ(50px); }
+    .back   { transform: rotateY(180deg) translateZ(50px); }
+    .right  { transform: rotateY(90deg) translateZ(50px); }
+    .left   { transform: rotateY(-90deg) translateZ(50px); }
+    .top    { transform: rotateX(90deg) translateZ(50px); }
+    .bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+    @keyframes rotateFull {
+        from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+        to { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+    }
+
+    h1, h2, h3, h4, h5, h6, p, label, span, .stMarkdown {
+        color: #00f2ff !important; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .stButton>button {
+        background: rgba(0, 242, 255, 0.1) !important;
+        color: #00f2ff !important; border: 1px solid #00f2ff !important;
+        border-radius: 12px !important; backdrop-filter: blur(10px);
+        transition: 0.4s;
+    }
+    .stButton>button:hover { background: #00f2ff !important; color: black !important; box-shadow: 0 0 30px #00f2ff; }
+    
+    input { background: rgba(255, 255, 255, 0.05) !important; color: white !important; border-radius: 10px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -130,54 +147,91 @@ st.markdown("""
 if "logged_in" not in st.session_state: st.session_state.logged_in = False
 if "user_fullname" not in st.session_state: st.session_state.user_fullname = ""
 
-# --- 6. AUTHENTICATION / SIDEBAR ---
-if db is None:
-    st.error("❌ DATABASE OFFLINE")
-    st.stop()
-
+# --- 6. NAVIGATION BAR ---
 with st.sidebar:
-    st.markdown(f"### 👤 {st.session_state.user_fullname if st.session_state.logged_in else 'GUEST MODE'}")
+    st.markdown(f"### 👤 <span style='color:#00f2ff'>{st.session_state.user_fullname if st.session_state.logged_in else 'GUEST MODE'}</span>", unsafe_allow_html=True)
     selected = option_menu("ChronosID Menu", ["Dashboard", "Analysis", "Dataset"], 
-                           icons=["house", "camera", "database"], menu_icon="shield-shaded", default_index=0,
-                           styles={"nav-link-selected": {"background-color": "#EAFF00", "color": "black"}})
-    if st.session_state.logged_in and st.button("🔴 LOGOUT"):
+                           icons=["house", "camera", "database"], default_index=0,
+                           styles={
+                               "container": {"background": "transparent"},
+                               "nav-link-selected": {"background-color": "#00f2ff", "color": "black"}
+                           })
+    if st.session_state.logged_in and st.button(" LOGOUT"):
         st.session_state.logged_in = False
         st.rerun()
 
 # --- 7. PAGE LOGIC ---
 if selected == "Dashboard":
-    st.title("🛡️ CHRONOSID ANALYTICS")
-    st.markdown('<div class="typewriter-text">Advanced face and gender estimation for secure biometric profiling.</div>', unsafe_allow_html=True)
+    st.title("CHRONOSID ANALYTICS")
     
-    col1, col2 = st.columns([2, 1.2])
+    col1, col2 = st.columns([2, 1.2], gap="large")
+    
     with col1:
-        st.markdown("### 🚀 ENGINE OPERATIONAL STATUS")
+        st.markdown(" ENGINE OPERATIONAL STATUS")
         m1, m2, m3 = st.columns(3)
-        with m1: st.markdown('<div class="metric-card"> CLOUD DB<br><b>CONNECTED</b></div>', unsafe_allow_html=True)
-        with m2: st.markdown('<div class="metric-card"> AI CORE<br><b>OPTIMIZED</b></div>', unsafe_allow_html=True)
-        with m3: st.markdown('<div class="metric-card"> SECURITY<br><b>ENFORCED</b></div>', unsafe_allow_html=True)
-    with col2:
-        if not st.session_state.logged_in:
-            st.markdown('<div class="auth-card">### 🔐 ACCESS PORTAL', unsafe_allow_html=True)
-            t1, t2 = st.tabs(["LOGIN", "REGISTER"])
-            with t1:
-                u, p = st.text_input("Username"), st.text_input("Password", type="password")
-                if st.button("AUTHENTICATE"):
-                    user = db.users.find_one({"username": u, "password": p})
-                    if user:
-                        st.session_state.logged_in, st.session_state.user_fullname = True, user["name"]
-                        st.rerun()
-            with t2:
-                rn, ru, rp = st.text_input("Full Name"), st.text_input("New User"), st.text_input("New Pass", type="password")
-                if st.button("CREATE PROFILE"):
-                    db.users.insert_one({"name": rn, "username": ru, "password": rp})
-                    st.success("Saved!")
-            st.markdown('</div>', unsafe_allow_html=True)
+        with m1: st.markdown('<div class="metric-card">CLOUD DB<br><b style="color:#00f2ff">SYNCED</b></div>', unsafe_allow_html=True)
+        with m2: st.markdown('<div class="metric-card">AI CORE<br><b style="color:#00f2ff">OPTIMIZED</b></div>', unsafe_allow_html=True)
+        with m3: st.markdown('<div class="metric-card">SECURITY<br><b style="color:#00f2ff">ENFORCED</b></div>', unsafe_allow_html=True)
+        
+        # 3D CUBE - THE CORE VISUAL CENTERPIECE
+        st.markdown("""
+            <div class="single-cube-container">
+                <div class="cube">
+                    <div class="face front"></div><div class="face back"></div>
+                    <div class="face right"></div><div class="face left"></div>
+                    <div class="face top"></div><div class="face bottom"></div>
+                </div>
+            </div>
+            <p style='text-align:center; font-size: 0.9rem; color: #00f2ff; letter-spacing: 2px; text-shadow: 0 0 5px #00f2ff;'>Welcome to ChronosID...</p>
+        """, unsafe_allow_html=True)
 
+    with col2:
+
+        if not st.session_state.logged_in:
+
+            st.markdown('<div class="auth-card"> ACCESS PORTAL', unsafe_allow_html=True)
+
+            t1, t2 = st.tabs(["LOGIN", "REGISTER"])
+
+            with t1:
+
+                u, p = st.text_input("Username"), st.text_input("Password", type="password")
+
+                if st.button("AUTHENTICATE"):
+
+                    if db is not None:
+
+                        user = db.users.find_one({"username": u, "password": p})
+
+                        if user:
+
+                            st.session_state.logged_in, st.session_state.user_fullname = True, user["name"]
+
+                            st.rerun()
+
+                        else: st.error("Invalid Credentials")
+
+                    else: st.error(" DATABASE OFFLINE")
+
+            with t2:
+
+                rn, ru, rp = st.text_input("Full Name"), st.text_input("New User"), st.text_input("New Pass", type="password")
+
+                if st.button("CREATE PROFILE"):
+
+                    if db is not None:
+
+                        db.users.insert_one({"name": rn, "username": ru, "password": rp})
+
+                        st.success("Authorized!")
+
+                    else: st.error(" DATABASE OFFLINE")
+
+            st.markdown('</div>', unsafe_allow_html=True)
 elif selected == "Analysis":
-    st.title("🔍 CHRONOSID VISION ENGINE")
+    st.title(" CHRONOSID VISION ENGINE")
     if not st.session_state.logged_in:
-        st.warning("🔒 SECURE ACCESS REQUIRED.")
+        st.warning(" SECURE ACCESS REQUIRED.")
     else:
         c_path, m_path = "models/haarcascade_frontalface_default.xml", "models/age_gender_model.h5"
         face_cascade = cv2.CascadeClassifier(c_path)
@@ -198,12 +252,12 @@ elif selected == "Analysis":
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
             if len(faces) == 0:
-                st.error("🛑 BIOMETRIC DATA NOT RECOGNIZED")
+                st.error(" BIOMETRIC DATA NOT RECOGNIZED")
             else:
                 display_img = input_image.copy()
                 analysis_results = []
                 
-                st.markdown(f"### 📡 SUBJECT TELEMETRY (Detected: {len(faces)})")
+                st.markdown(f" SUBJECT TELEMETRY (Detected: {len(faces)})")
                 cols = st.columns(len(faces))
 
                 for i, (x, y, w, h) in enumerate(faces):
@@ -236,9 +290,9 @@ elif selected == "Analysis":
                         st.markdown(f"**SUBJECT {i+1}**")
                         roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
                         st.image(roi_rgb, caption=f"Bio-Profile {i+1}", use_container_width=True)
-                        st.write(f"🧬 **Gender:** {g_lab}")
-                        st.write(f"⏳ **Range:** {age_range} Yrs")
-                        st.write(f"🎯 **Confidence:** {acc}%")
+                        st.write(f"Gender: {g_lab}")
+                        st.write(f"Range: {age_range} Yrs")
+                        st.write(f"Confidence:{acc}%")
 
                 st.markdown("---")
                 st.markdown('<div class="scanner-container"><div class="scanner-line"></div>', unsafe_allow_html=True)
@@ -247,5 +301,5 @@ elif selected == "Analysis":
 
                 # PDF Button
                 pdf_data = generate_pdf_report(st.session_state.user_fullname, analysis_results)
-                st.download_button(label="📥 DOWNLOAD BIOMETRIC REPORT (PDF)", data=pdf_data, 
+                st.download_button(label=" DOWNLOAD BIOMETRIC REPORT (PDF)", data=pdf_data, 
                                    file_name=f"ChronosID_Report_{datetime.now().strftime('%H%M%S')}.pdf", mime="application/pdf")
