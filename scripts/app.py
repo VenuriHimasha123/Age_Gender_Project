@@ -11,6 +11,19 @@ from fpdf import FPDF
 import tempfile
 import uuid
 
+import base64
+
+# Add this function here
+def get_base64(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+# Replace this path with the path to your image on your desktop
+# Example: "C:/Users/YourName/Desktop/background.jpg"
+# IMPORTANT: Use forward slashes (/) or double backslashes (\\)
+bin_str = get_base64("assets/background.png")
+
 # --- 1. MONGODB CONNECTION SETTINGS ---
 MONGO_URI = "mongodb+srv://venurihimasha123_db_user:venuri@cluster0.uhy55kg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
@@ -71,20 +84,30 @@ def generate_pdf_report(operator, results):
 # --- 3. PAGE CONFIGURATION ---
 st.set_page_config(page_title="ChronosID Analytics | Hyper Vision", layout="wide", page_icon="")
 
+# --- 4. HD BACKGROUND, GLASSMORPHISM & SMOOTH SCROLLING ---
+# Replace the URL below with any high-quality image link you prefer
+bg_image_url = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop"
+
 # --- 4. ADVANCED CSS: GLASSMORPHISM, SMOOTH SCROLLING & UI FIXES ---
-st.markdown("""
+st.markdown(f"""
     <style>
     /* Global Smooth Scrolling */
-    html { scroll-behavior: smooth; }
+    html {{ 
+        scroll-behavior: smooth; 
+    }}
     
-    .stApp {
-        background: radial-gradient(circle at center, #0a0a2e 0%, #000000 100%);
+    .stApp {{
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                          url("data:image/png;base64,{bin_str}");
+        background-size: cover;
+        background-position: center;
         background-attachment: fixed;
-    }
+    
+    }}
 
     /* GLASSMORPHISM UNIVERSAL STYLE */
     .metric-card, .auth-card, .stTabs, [data-testid="stMetricValue"], 
-    [data-testid="stSidebar"] > div:first-child, .stFileUploader, .stCameraInput {
+    [data-testid="stSidebar"] > div:first-child, .stFileUploader, .stCameraInput {{
         background: rgba(255, 255, 255, 0.04) !important;
         backdrop-filter: blur(25px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
@@ -94,52 +117,59 @@ st.markdown("""
         transition: transform 0.3s ease;
         padding: 20px;
         margin-bottom: 10px;
-    }
+    }}
 
-    [data-testid="stSidebar"] {
+    [data-testid="stSidebar"] {{
         background-color: transparent !important;
         border-right: 1px solid rgba(0, 242, 255, 0.2);
-    }
+    }}
 
     /* 3D Neural Cube Component */
-    .single-cube-container {
+    .single-cube-container {{
         width: 100%; height: 280px; display: flex; justify-content: center; align-items: center;
         perspective: 1000px; margin: 20px 0;
-    }
-    .cube {
+    }}
+    .cube {{
         width: 100px; height: 100px; position: relative; transform-style: preserve-3d;
         animation: rotateFull 12s infinite linear;
-    }
-    .face {
+    }}
+    .face {{
         position: absolute; width: 100px; height: 100px; border: 2px solid #00f2ff;
         background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 25px #00f2ff, inset 0 0 15px #00f2ff;
-    }
-    .front  { transform: rotateY(0deg) translateZ(50px); }
-    .back   { transform: rotateY(180deg) translateZ(50px); }
-    .right  { transform: rotateY(90deg) translateZ(50px); }
-    .left   { transform: rotateY(-90deg) translateZ(50px); }
-    .top    { transform: rotateX(90deg) translateZ(50px); }
-    .bottom { transform: rotateX(-90deg) translateZ(50px); }
+    }}
+    .front  {{ transform: rotateY(0deg) translateZ(50px); }}
+    .back   {{ transform: rotateY(180deg) translateZ(50px); }}
+    .right  {{ transform: rotateY(90deg) translateZ(50px); }}
+    .left   {{ transform: rotateY(-90deg) translateZ(50px); }}
+    .top    {{ transform: rotateX(90deg) translateZ(50px); }}
+    .bottom {{ transform: rotateX(-90deg) translateZ(50px); }}
 
-    @keyframes rotateFull {
-        from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-        to { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
-    }
+    @keyframes rotateFull {{
+        from {{ transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }}
+        to {{ transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }}
+    }}
 
-    h1, h2, h3, h4, h5, h6, p, label, span, .stMarkdown {
+    h1, h2, h3, h4, h5, h6, p, label, span, .stMarkdown {{
         color: #00f2ff !important; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         font-family: 'Courier New', Courier, monospace;
-    }
+    }}
 
-    .stButton>button {
+    .stButton>button {{
         background: rgba(0, 242, 255, 0.1) !important;
         color: #00f2ff !important; border: 1px solid #00f2ff !important;
         border-radius: 12px !important; backdrop-filter: blur(10px);
         transition: 0.4s;
-    }
-    .stButton>button:hover { background: #00f2ff !important; color: black !important; box-shadow: 0 0 30px #00f2ff; }
+    }}
+    .stButton>button:hover {{ 
+        background: #00f2ff !important; color: black !important; box-shadow: 0 0 30px #00f2ff; 
+    }}
     
-    input { background: rgba(255, 255, 255, 0.05) !important; color: white !important; border-radius: 10px !important; }
+    input {{ 
+        background: rgba(255, 255, 255, 0.05) !important; 
+        color: white !important; 
+        border: 1px solid rgba(0, 242, 255, 0.3) !important;
+        border-radius: 10px !important; 
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -162,16 +192,130 @@ with st.sidebar:
 
 # --- 7. PAGE LOGIC ---
 if selected == "Dashboard":
-    st.title("CHRONOSID ANALYTICS")
+    st.title("ChronosID Analytics - Hyper Vision")
     
     col1, col2 = st.columns([2, 1.2], gap="large")
     
     with col1:
-        st.markdown(" ENGINE OPERATIONAL STATUS")
-        m1, m2, m3 = st.columns(3)
-        with m1: st.markdown('<div class="metric-card">CLOUD DB<br><b style="color:#00f2ff">SYNCED</b></div>', unsafe_allow_html=True)
-        with m2: st.markdown('<div class="metric-card">AI CORE<br><b style="color:#00f2ff">OPTIMIZED</b></div>', unsafe_allow_html=True)
-        with m3: st.markdown('<div class="metric-card">SECURITY<br><b style="color:#00f2ff">ENFORCED</b></div>', unsafe_allow_html=True)
+        # 1. TYPEWRITER HEADER (Fixed Syntax)
+        st.markdown("""
+            <div class="typewriter-viewport">
+                <h3 class="typewriter-text">Discover the Power Behind Every Face</h3>
+            </div>
+            <style>
+            .typewriter-viewport {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                height: 60px;
+                margin-bottom: 20px;
+            }
+            .typewriter-text {
+                color: #FF3131 !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                font-size: 1.6rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                border-right: 3px solid #FF3131 !important;
+                width: 0;
+                animation: 
+                    typing 3.5s steps(35, end) forwards,
+                    blink-caret 0.75s step-end infinite;
+                text-shadow: 0 0 10px rgba(0, 242, 255, 0.7) !important;
+            }
+            @keyframes typing { from { width: 0 } to { width: 100% } }
+            @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #00f2ff } }
+            </style>
+        """, unsafe_allow_html=True)
+        
+        # Grid Layout for 3 Rows of 2 Cards
+        row1 = st.columns(2)
+        row2 = st.columns(2)
+        row3 = st.columns(2)
+
+        # ROW 1: CORE BIOMETRICS
+        with row1[0]:
+            st.markdown("""
+               <div class="metric-card">
+                    <b style="color:#00f2ff; font-size:1.1rem;">Smart Age Analysis</b>
+                    <p style="font-size:0.85rem; margin-top:5px;">AI-driven neural age estimation.</p>
+                    <details style="cursor:pointer; font-size:0.8rem; color:#00f2ff;">
+                        <summary>Read More</summary>
+                        <p style="color:white; opacity:0.8; margin-top:5px;">
+                        Utilizes deep neural networks to extract facial features and estimate age by analyzing skin texture and bone structure patterns.
+                        </p>
+                    </details>
+                </div>
+            """, unsafe_allow_html=True)
+        with row1[1]:
+            st.markdown("""
+               <div class="metric-card">
+                    <b style="color:#00f2ff; font-size:1.1rem;">Accurate Gender Detection</b>
+                    <p style="font-size:0.85rem; margin-top:5px;">Advanced gender identification.</p>
+                    <details style="cursor:pointer; font-size:0.8rem; color:#00f2ff;">
+                        <summary>Read More</summary>
+                        <p style="color:white; opacity:0.8; margin-top:5px;">
+                        Performs binary gender classification through high-dimensional facial vector analysis, ensuring high accuracy across diverse ethnicities.
+                        </p>
+                    </details>
+                </div>
+            """, unsafe_allow_html=True)
+
+        # ROW 2: DATA & REPORTING
+        with row2[0]:
+            st.markdown("""
+              <div class="metric-card">
+                    <b style="color:#00f2ff; font-size:1.1rem;">MongoDB Cloud Storage</b>
+                    <p style="font-size:0.85rem; margin-top:5px;">Secure MongoDB cloud integration.</p>
+                    <details style="cursor:pointer; font-size:0.8rem; color:#00f2ff;">
+                        <summary>Read More</summary>
+                        <p style="color:white; opacity:0.8; margin-top:5px;">
+                        Securely transmits and stores user telemetry and scan logs in a MongoDB Atlas cloud cluster for global data accessibility.
+                        </p>
+                    </details>
+                </div>
+            """, unsafe_allow_html=True)
+        with row2[1]:
+            st.markdown("""
+               <div class="metric-card">
+                    <b style="color:#00f2ff; font-size:1.1rem;">PDF Report Generator</b>
+                    <p style="font-size:0.85rem; margin-top:5px;">Standardized PDF reporting.</p>
+                    <details style="cursor:pointer; font-size:0.8rem; color:#00f2ff;">
+                        <summary>Read More</summary>
+                        <p style="color:white; opacity:0.8; margin-top:5px;">
+                        Generates standardized PDF biometric reports including subject IDs, timestamps, and cropped face profiles for professional use.
+                        </p>
+                    </details>
+                </div>
+            """, unsafe_allow_html=True)
+
+        # ROW 3: INPUT & SCALABILITY
+        with row3[0]:
+            st.markdown("""
+              <div class="metric-card">
+                    <b style="color:#00f2ff; font-size:1.1rem;">Multiple Face Recognition</b>
+                    <p style="font-size:0.85rem; margin-top:5px;">Parallel processing for group scans.</p>
+                    <details style="cursor:pointer; font-size:0.8rem; color:#00f2ff;">
+                        <summary>Read More</summary>
+                        <p style="color:white; opacity:0.8; margin-top:5px;">
+                        Capable of parallel processing multiple faces within a single frame, identifying age and gender for everyone detected simultaneously.
+                        </p>
+                    </details>
+                </div>
+            """, unsafe_allow_html=True)
+        with row3[1]:
+            st.markdown("""
+                <div class="metric-card">
+                    <b style="color:#00f2ff; font-size:1.1rem;">Live Camera & File Upload</b>
+                    <p style="font-size:0.85rem; margin-top:5px;">Live and static input support.</p>
+                    <details style="cursor:pointer; font-size:0.8rem; color:#00f2ff;">
+                        <summary>Read More</summary>
+                        <p style="color:white; opacity:0.8; margin-top:5px;">
+                        A versatile input gateway supporting real-time live webcam streams as well as static file uploads for offline biometric analysis.
+                        </p>
+                    </details>
+                </div>
+            """, unsafe_allow_html=True)
         
         # 3D CUBE - THE CORE VISUAL CENTERPIECE
         st.markdown("""
