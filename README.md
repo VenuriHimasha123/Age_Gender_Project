@@ -1,8 +1,3 @@
-
-<img width="1897" height="842" alt="imgguuu" src="https://github.com/user-attachments/assets/d609c5c7-22ec-46ba-887b-b293448dde22" />
-
-
-
 # ChronosID Analytics: Biometric Intelligence Engine
 ChronosID Analytics is a high-performance neural vision platform designed for real-time age and gender estimation. Built with a futuristic Cyber-Neon aesthetic, it combines deep learning with cloud data persistence and advanced 3D web rendering.
 
